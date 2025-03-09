@@ -49,6 +49,10 @@ input[type="text"], input[type="color"], input[type="number"] {
     box-sizing: border-box;
 }
 
+input[type="color"] {
+    height: 40px; /* Increase height for better visibility on mobile */
+}
+
 button {
     padding: 10px 15px;
     margin-top: 10px;
