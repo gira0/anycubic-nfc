@@ -10,6 +10,16 @@ document.addEventListener("DOMContentLoaded", function() {
     const bedTempMaxInput = document.getElementById("bedTempMax");
     const outputDiv = document.getElementById("output");
     const copyButton = document.getElementById("copy");
+    const warningDiv = document.getElementById("warning");
+
+    function isChromium() {
+        const userAgent = navigator.userAgent;
+        return userAgent.includes("Chrome") || userAgent.includes("Chromium");
+    }
+
+    if (!isChromium()) {
+        warningDiv.style.display = "block";
+    }
 
     function hexToRGBA(hex) {
         let r, g, b, a;
