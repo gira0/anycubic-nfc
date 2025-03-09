@@ -99,4 +99,14 @@ A2:2C:00:00:00:00
     colorPicker.addEventListener('input', function() {
         colorInput.value = this.value;
     });
+
+    document.getElementById('writeNFC').addEventListener('click', async () => {
+        try {
+            const ndef = new NDEFReader();
+            await ndef.write("Hello, NFC!");
+            console.log("NFC tag written successfully.");
+        } catch (error) {
+            console.error("Error writing to NFC tag:", error);
+        }
+    });
 });
