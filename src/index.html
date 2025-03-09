@@ -14,26 +14,31 @@
             <input type="text" id="material" maxlength="4" placeholder="PLA+">
             
             <label for="color">Color (HEX or Name):</label>
-            <input type="text" id="color" placeholder="e.g., #66000000 or red">
-            
-            <label for="colorPicker">Pick a color:</label>
-            <input type="color" id="colorPicker">
+            <div class="color-input-container">
+                <input type="text" id="color" placeholder="e.g., #66000000 or red">
+                <input type="color" id="colorPicker">
+            </div>
             
             <label for="hotendTempMin">Hotend Temp Min:</label>
-            <input type="number" id="hotendTempMin" placeholder="240">
+            <input type="number" id="hotendTempMin" placeholder="240" min="180" max="300">
             
             <label for="hotendTempMax">Hotend Temp Max:</label>
-            <input type="number" id="hotendTempMax" placeholder="260">
+            <input type="number" id="hotendTempMax" placeholder="260" min="180" max="300">
             
             <label for="bedTempMin">Bed Temp Min:</label>
-            <input type="number" id="bedTempMin" placeholder="90">
+            <input type="number" id="bedTempMin" placeholder="90" min="0" max="120">
             
             <label for="bedTempMax">Bed Temp Max:</label>
-            <input type="number" id="bedTempMax" placeholder="115">
+            <input type="number" id="bedTempMax" placeholder="115" min="0" max="120">
+            
+            <label for="overrideLimits">
+                <input type="checkbox" id="overrideLimits"> Override temperature limits
+            </label>
             
             <button type="button" id="generate">Generate Hex String</button>
             <button type="button" id="writeNFC">Write to NFC</button>
             <button type="button" id="readNFC">Read from NFC</button>
+            <button type="button" id="copy">Copy Hex String</button>
         </form>
         
         <h2>Output:</h2>

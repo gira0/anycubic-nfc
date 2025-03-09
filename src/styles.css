@@ -49,8 +49,20 @@ input[type="text"], input[type="color"], input[type="number"] {
     box-sizing: border-box;
 }
 
-input[type="color"] {
+.color-input-container {
+    display: flex;
+    align-items: center;
+}
+
+.color-input-container input[type="text"],
+.color-input-container input[type="color"] {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.color-input-container input[type="color"] {
     height: 40px; /* Increase height for better visibility on mobile */
+    margin-right: 0; /* Remove margin from the last element */
 }
 
 button {

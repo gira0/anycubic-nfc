@@ -8,8 +8,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const hotendTempMaxInput = document.getElementById("hotendTempMax");
     const bedTempMinInput = document.getElementById("bedTempMin");
     const bedTempMaxInput = document.getElementById("bedTempMax");
+    const overrideLimitsCheckbox = document.getElementById("overrideLimits");
     const outputDiv = document.getElementById("output");
     const copyButton = document.getElementById("copy");
+
+    if (!materialInput || !colorInput || !colorPicker || !hotendTempMinInput || !hotendTempMaxInput || !bedTempMinInput || !bedTempMaxInput || !outputDiv || !copyButton || !overrideLimitsCheckbox) {
+        console.error("One or more elements are missing from the DOM.");
+        return;
+    }
 
     function hexToRGBA(hex) {
         let r, g, b, a;
@@ -82,13 +88,83 @@ A2:2C:00:00:00:00
     document.getElementById("generate").addEventListener("click", function() {
         const material = materialInput.value || "PLA+";
         const color = colorInput.value || "#660000"; // Default color
-        const hotendTempMin = parseInt(hotendTempMinInput.value) || 240;
-        const hotendTempMax = parseInt(hotendTempMaxInput.value) || 260;
-        const bedTempMin = parseInt(bedTempMinInput.value) || 90;
-        const bedTempMax = parseInt(bedTempMaxInput.value) || 115;
+        let hotendTempMin = parseInt(hotendTempMinInput.value) || 240;
+        let hotendTempMax = parseInt(hotendTempMaxInput.value) || 260;
+        let bedTempMin = parseInt(bedTempMinInput.value) || 90;
+        let bedTempMax = parseInt(bedTempMaxInput.value) || 115;
+
+        if (!overrideLimitsCheckbox.checked) {
+            hotendTempMin = Math.max(180, Math.min(hotendTempMin, 300)); // Limit between 180 and 300
+            hotendTempMax = Math.max(180, Math.min(hotendTempMax, 300)); // Limit between 180 and 300
+            bedTempMin = Math.max(0, Math.min(bedTempMin, 120)); // Limit between 0 and 120
+            bedTempMax = Math.max(0, Math.min(bedTempMax, 120)); // Limit between 0 and 120
+        }
+
         const hexString = generateHexString(material, color, hotendTempMin, hotendTempMax, bedTempMin, bedTempMax);
         outputDiv.textContent = hexString;
     });
+
+    overrideLimitsCheckbox.addEventListener('change', function() {
+        if (overrideLimitsCheckbox.checked) {
+            hotendTempMinInput.removeAttribute('min');
+            hotendTempMinInput.removeAttribute('max');
+            hotendTempMaxInput.removeAttribute('min');
+            hotendTempMaxInput.removeAttribute('max');
+            bedTempMinInput.removeAttribute('min');
+            bedTempMinInput.removeAttribute('max');
+            bedTempMaxInput.removeAttribute('min');
+            bedTempMaxInput.removeAttribute('max');
+        } else {
+            hotendTempMinInput.setAttribute('min', '180');
+            hotendTempMinInput.setAttribute('max', '300');
+            hotendTempMaxInput.setAttribute('min', '180');
+            hotendTempMaxInput.setAttribute('max', '300');
+            bedTempMinInput.setAttribute('min', '0');
+            bedTempMinInput.setAttribute('max', '120');
+            bedTempMaxInput.setAttribute('min', '0');
+            bedTempMaxInput.setAttribute('max', '120');
+
+            // Round to safe limits
+            hotendTempMinInput.value = Math.max(180, Math.min(parseInt(hotendTempMinInput.value) || 240, 300));
+            hotendTempMaxInput.value = Math.max(180, Math.min(parseInt(hotendTempMaxInput.value) || 260, 300));
+            bedTempMinInput.value = Math.max(0, Math.min(parseInt(bedTempMinInput.value) || 90, 120));
+            bedTempMaxInput.value = Math.max(0, Math.min(parseInt(bedTempMaxInput.value) || 115, 120));
+
+            // Ensure min is not greater than max and vice versa
+            if (parseInt(hotendTempMinInput.value) > parseInt(hotendTempMaxInput.value)) {
+                hotendTempMaxInput.value = hotendTempMinInput.value;
+            }
+            if (parseInt(hotendTempMaxInput.value) < parseInt(hotendTempMinInput.value)) {
+                hotendTempMinInput.value = hotendTempMaxInput.value;
+            }
+            if (parseInt(bedTempMinInput.value) > parseInt(bedTempMaxInput.value)) {
+                bedTempMaxInput.value = bedTempMinInput.value;
+            }
+            if (parseInt(bedTempMaxInput.value) < parseInt(bedTempMinInput.value)) {
+                bedTempMinInput.value = bedTempMaxInput.value;
+            }
+        }
+    });
+
+    function validateTempInputs() {
+        if (parseInt(hotendTempMinInput.value) > parseInt(hotendTempMaxInput.value)) {
+            hotendTempMaxInput.value = hotendTempMinInput.value;
+        }
+        if (parseInt(hotendTempMaxInput.value) < parseInt(hotendTempMinInput.value)) {
+            hotendTempMinInput.value = hotendTempMaxInput.value;
+        }
+        if (parseInt(bedTempMinInput.value) > parseInt(bedTempMaxInput.value)) {
+            bedTempMaxInput.value = bedTempMinInput.value;
+        }
+        if (parseInt(bedTempMaxInput.value) < parseInt(bedTempMinInput.value)) {
+            bedTempMinInput.value = bedTempMaxInput.value;
+        }
+    }
+
+    hotendTempMinInput.addEventListener('input', validateTempInputs);
+    hotendTempMaxInput.addEventListener('input', validateTempInputs);
+    bedTempMinInput.addEventListener('input', validateTempInputs);
+    bedTempMaxInput.addEventListener('input', validateTempInputs);
 
     copyButton.addEventListener("click", function() {
         navigator.clipboard.writeText(outputDiv.textContent).then(() => {
@@ -97,8 +173,17 @@ A2:2C:00:00:00:00
     });
 
     colorPicker.addEventListener('input', function() {
-        colorInput.value = this.value;
+        colorInput.value = colorPicker.value;
+        colorInput.style.backgroundColor = colorPicker.value; // Update background color
     });
+
+    colorInput.addEventListener('input', function() {
+        colorPicker.value = colorInput.value;
+        colorInput.style.backgroundColor = colorInput.value; // Update background color
+    });
+
+    // Set initial background color for color input
+    colorInput.style.backgroundColor = colorInput.value;
 
     document.getElementById('writeNFC').addEventListener('click', async () => {
         try {
