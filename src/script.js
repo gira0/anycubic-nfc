@@ -103,10 +103,27 @@ A2:2C:00:00:00:00
     document.getElementById('writeNFC').addEventListener('click', async () => {
         try {
             const ndef = new NDEFReader();
-            await ndef.write("Hello, NFC!");
+            await ndef.write(outputDiv.textContent);
             console.log("NFC tag written successfully.");
         } catch (error) {
             console.error("Error writing to NFC tag:", error);
+        }
+    });
+
+    document.getElementById('readNFC').addEventListener('click', async () => {
+        try {
+            const ndef = new NDEFReader();
+            await ndef.scan();
+            ndef.onreading = event => {
+                const decoder = new TextDecoder();
+                for (const record of event.message.records) {
+                    console.log("NFC tag read:", decoder.decode(record.data));
+                    outputDiv.textContent = decoder.decode(record.data);
+                }
+            };
+            console.log("NFC tag read successfully.");
+        } catch (error) {
+            console.error("Error reading from NFC tag:", error);
         }
     });
 });
